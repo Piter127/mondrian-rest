@@ -217,29 +217,29 @@ module Mondrian::REST
                     get do
                       cube = get_cube_or_404(params[:cube_name])
                       dimension = cube.dimension(params[:dimension_name])
-                      members = []
+                      # members = []
 
-                      dimension.hierarchies.each do |hierarchy|
-                        level = hierarchy.level(params[:level_name])
+                      # dimension.hierarchies.each do |hierarchy|
+                      #   level = hierarchy.level(params[:level_name])
 
-                        member = level.members.detect do |m|
-                          m.property_value('MEMBER_KEY').to_s == params[:member_key]
-                        end
-                        error!('member not found', 404) if member.nil?
-                        members << member
-                          .to_h(params[:member_properties], params[:caption], params[:children])
-                          .merge(ancestors: member.ancestors.map(&:to_h))
-                      end
-
-                      # level = dimension.hierarchies[0].level(params[:level_name])
-
-                      # member = level.members.detect do |m|
-                      #   m.property_value('MEMBER_KEY').to_s == params[:member_key]
+                      #   member = level.members.detect do |m|
+                      #     m.property_value('MEMBER_UNIQUE_NAME').to_s == params[:member_key]
+                      #   end
+                      #   error!('member not found', 404) if member.nil?
+                      #   members << member
+                      #     .to_h(params[:member_properties], params[:caption], params[:children])
+                      #     .merge(ancestors: member.ancestors.map(&:to_h))
                       # end
-                      # error!('member not found', 404) if member.nil?
-                      # member
-                      #   .to_h(params[:member_properties], params[:caption], params[:children])
-                      #   .merge(ancestors: member.ancestors.map(&:to_h))
+
+                      level = dimension.hierarchies[0].level(params[:level_name])
+
+                      member = level.members.detect do |m|
+                        m.property_value('MEMBER_UNIQUE_NAME').to_s == params[:member_key]
+                      end
+                      error!('member not found', 404) if member.nil?
+                      member
+                        .to_h(params[:member_properties], params[:caption], params[:children])
+                        .merge(ancestors: member.ancestors.map(&:to_h))
                     end
                   end
                 end

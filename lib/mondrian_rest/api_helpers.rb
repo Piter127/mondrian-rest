@@ -69,38 +69,24 @@ module Mondrian::REST
       if dimension.nil?
         error!("dimension #{params[:dimension_name]} not found in cube #{params[:cube_name]}", 404)
       end
-      
+
       hier = unless params[:hierarchy_name].nil?
                h = dimension.hierarchy(params[:hierarchy_name])
                error!("Hierarchy #{params[:hierarchy_name]} does not exist in dimension #{params[:dimension_name]}", 404) if h.nil?
-               h.to_a
+               h
              else
-               dimension.hierarchies
+               dimension.hierarchies.first
              end
-      levels = []
 
-      hier.each do |hierarchy|
-        level = hierarchy.level(params[:level_name])
-        if level.nil?
-          error!("level #{params[:level_name]} not found in dimension #{params[:dimension_name]}")
-        end
-        levels << level.to_h(member_properties: params[:member_properties],
+      level = hier.level(params[:level_name])
+      if level.nil?
+        error!("level #{params[:level_name]} not found in dimension #{params[:dimension_name]}")
+      end
+
+      level.to_h(member_properties: params[:member_properties],
                  get_children: params[:children],
                  member_caption: params[:caption],
                  get_members: true)
-      end
-
-      levels.flatten
-
-      # level = hier.level(params[:level_name])
-      # if level.nil?
-      #   error!("level #{params[:level_name]} not found in dimension #{params[:dimension_name]}")
-      # end
-
-      # level.to_h(member_properties: params[:member_properties],
-      #            get_children: params[:children],
-      #            member_caption: params[:caption],
-      #            get_members: true)
     end
 
     NEST = Mondrian::REST::Nest.new

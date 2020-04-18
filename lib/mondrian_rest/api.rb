@@ -194,6 +194,7 @@ module Mondrian::REST
             resource :levels do
               route_param :level_name do
                 resource :members do
+                  logger.info("Resource :members")
                   params do
                     optional :member_properties, type: Array, default: []
                     optional :caption, type: String, desc: 'Replace caption with property', default: nil
@@ -201,6 +202,7 @@ module Mondrian::REST
                   end
 
                   get do
+                    logger.info("get_members")
                     get_members(params)
                   end
 
@@ -215,12 +217,14 @@ module Mondrian::REST
                     end
 
                     get do
+                      
+                      logger.info("get_members")
                       cube = get_cube_or_404(params[:cube_name])
                       dimension = cube.dimension(params[:dimension_name])
                       level = dimension.hierarchies[0].level(params[:level_name])
 
                       member = level.members.detect do |m|
-                        m.property_value('MEMBER_UNIQUE_NAME').to_s == params[:member_key]
+                        m.property_value('MEMBER_KEY').to_s == params[:member_key]
                       end
                       error!('member not found', 404) if member.nil?
                       member

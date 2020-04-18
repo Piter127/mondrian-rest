@@ -63,6 +63,7 @@ module Mondrian::REST
     end
 
     def get_members(params)
+      logger.info(params.join(", "))
       cube = get_cube_or_404(params[:cube_name])
 
       dimension = cube.dimension(params[:dimension_name])
